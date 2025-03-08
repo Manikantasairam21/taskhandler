@@ -1,0 +1,176 @@
+/* Home.module.css */
+
+.App {
+    font-family: 'Arial', sans-serif;
+    margin: 30px auto;
+    padding: 20px;
+    max-width: 800px;
+    background-color: #03865d;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+}
+
+.taskHeader {
+    text-align: center;
+    background-color: #64b24eef;
+    color: #000000;
+    padding: 10px 0;
+    margin-bottom: 20px;
+    border-radius: 8px 8px 0 0;
+}
+
+.taskForm {
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.taskNameInput,.taskDeadlineInput{
+    margin: 5px;
+    padding: 10px;
+    border: 1px solid #069d33b2;
+    border-radius: 4px;
+    flex-grow: 1;
+    font-size: 16px;
+    color: #040404;
+}
+.taskPrioritySelect,
+.addTaskButton {
+    margin: 5px;
+    padding: 10px;
+    border: 1px solid #069d33b2;
+    border-radius: 4px;
+    flex-grow: 1;
+    font-size: 16px;
+    color: #f6f1f1;
+}
+
+.taskPrioritySelect {
+    cursor: pointer;
+    background-color: #03531f;
+}
+
+.addTaskButton {
+    background-color:#03531f;
+    color: rgb(253, 253, 253);
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.addTaskButton:hover {
+    background-color: #12df5a;
+}
+
+.searchFilter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.searchInput,
+.filterPrioritySelect {
+    padding: 10px;
+    border: 1px solid #03531f;
+    border-radius: 4px;
+    flex-grow: 1;
+    font-size: 16px;
+}
+
+.heading {
+    color: black;
+    text-align: center;
+    font-weight: 400;
+}
+
+.completedHeading {
+    color: black;
+    text-align: center;
+    font-weight: 400;
+}
+
+.taskTable {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #80f916e8;
+}
+
+.taskTable th,
+.taskTable td {
+    padding: 10px;
+    text-align: center;
+}
+
+.taskTable th {
+    background-color:#03531f;
+    color: white;
+}
+
+.taskTable tbody tr:nth-child(even) {
+    background-color: #03531f;
+}
+
+.completedTable {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #405e03;
+}
+
+.completedTable th,
+.completedTable td {
+    padding: 10px;
+    text-align: center;
+}
+
+.completedTable th {
+    background-color: #09890f;
+    color: rgb(241, 235, 235);
+}
+
+.completedTable tbody tr:nth-child(even) {
+    background-color: #37f20db7;
+}
+
+.deleteTaskButton {
+    margin-right: 5px;
+    cursor: pointer;
+    padding: 12px;
+    background: rgba(243, 51, 3, 0.862);
+    border-radius: 10px;
+    border: none;
+    color: rgb(3, 3, 3);
+}
+
+.deleteTaskButton:hover {
+    background: red;
+}
+
+.markDoneButton,
+.editTaskButton {
+    margin-right: 5px;
+    cursor: pointer;
+    padding: 12px;
+    background: #f24c15b8;
+    border-radius: 10px;
+    border: none;
+    color: rgb(8, 5, 5);
+}
+
+.markDoneButton:hover {
+    background: rgb(23, 175, 23);
+}
+
+.editTaskButton:hover {
+    background: rgb(23, 175, 23);
+}
+
+@media (max-width: 600px) {
+    .taskForm {
+        flex-direction: column;
+    }
+
+    .searchFilter {
+        flex-direction: column;
+    }
+}
