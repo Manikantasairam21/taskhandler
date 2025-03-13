@@ -1,5 +1,3 @@
-// src/components/TaskScheduler.js
-
 import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
@@ -12,53 +10,40 @@ const TaskScheduler = () => {
     const [completedTasks, setCompletedTasks] = useState([]);
     const [taskName, setTaskName] = useState("");
     const [taskPriority, setTaskPriority] = useState("Top");
-    const [taskVal, setTaskDeadline] = useState("");
+    const [taskDeadline, setTaskDeadline] = useState("");
     const [searchKeyword, setSearchKeyword] = useState("");
     const [filterPriority, setFilterPriority] = useState("");
 
-    const TASKS_STORAGE_KEY = "tasks";
-    const COMPLETED_TASKS_STORAGE_KEY = "completedTasks";
 
-    useEffect(() => {
-        const storedTasks = JSON.parse(localStorage.getItem(TASKS_STORAGE_KEY));
-        if (storedTasks) {
-            setTasks(storedTasks);
+
+    const fetchTasks = async () => {
+        try {
+            const res = await fetch(`/api/task?searchKeyword=${searchKeyword}&filterPriority=${filterPriority}`);
+            const data = await res.json();
+            console.log("Fetched tasks:", data); // Log the fetched data
+            if (Array.isArray(data)) {
+                setTasks(data); // Ensure data is an array before setting state
+            } else {
+                setTasks([]); // Set empty array if data is not an array
+            }
+        } catch (error) {
+            console.error("Error fetching tasks:", error);
+            setTasks([]); // Handle the case where the fetch fails
         }
-
-        const storedCompletedTasks = JSON.parse(localStorage.getItem(COMPLETED_TASKS_STORAGE_KEY));
-        if (storedCompletedTasks) {
-            setCompletedTasks(storedCompletedTasks);
-        }
-    }, []);
+    };
 
     useEffect(() => {
-        localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(tasks));
-    }, [tasks]);
+        fetchTasks();
+    }, [searchKeyword, filterPriority]);
+    // Refetch when search or filter changes
 
-    useEffect(() => {
-        localStorage.setItem(COMPLETED_TASKS_STORAGE_KEY, JSON.stringify(completedTasks));
-    }, [completedTasks]);
-
-    const handleTaskNameChange = (e) => {
-        6
-        setTaskName(e.target.value);
-    };
-
-    const handleTaskPriorityChange = (e) => {
-        setTaskPriority(e.target.value);
-    };
-
-    const handleTaskDeadlineChange = (e) => {
-        setTaskDeadline(e.target.value);
-    };
-
-    const addTask = () => {
-        if (taskName.trim() === "" || taskVal === "") {
-            alert("Enter a task, Must not Empty!!!");
+    const addTask = async () => {
+        if (taskName.trim() === "" || taskDeadline === "") {
+            alert("Enter a task, must not be empty!");
             return;
         }
 
-        const selDate = new Date(taskVal);
+        const selDate = new Date(taskDeadline);
         const currDate = new Date();
 
         if (selDate <= currDate) {
@@ -67,67 +52,63 @@ const TaskScheduler = () => {
         }
 
         const newTask = {
-            id: tasks.length + 1,
             task: taskName,
             priority: taskPriority,
-            deadline: taskVal,
-            done: false,
+            deadline: taskDeadline,
         };
 
-        // Fetch existing tasks from local storage
-        const existingTasks = JSON.parse(localStorage.getItem(TASKS_STORAGE_KEY)) || [];
+        try {
+            const res = await fetch("/api/task", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(newTask),
+            });
 
-        // Append the new task to existing tasks
-        const updatedTasks = [...existingTasks, newTask];
-
-        // Update tasks state
-        setTasks(updatedTasks);
-
-        // Update local storage with combined old and new tasks
-        localStorage.setItem(TASKS_STORAGE_KEY, JSON.stringify(updatedTasks));
-
-        setTaskName("");
-        setTaskPriority("Top");
-        setTaskDeadline("");
+            if (res.ok) {
+                setTaskName("");
+                setTaskPriority("Top");
+                setTaskDeadline("");
+                fetchTasks(); // Refetch tasks after adding a new one
+            } else {
+                console.error("Failed to add task");
+            }
+        } catch (error) {
+            console.error("Error adding task:", error);
+        }
     };
 
     const handleEditTask = (id) => {
-        const taskToEdit = tasks.find((t) => t.id === id);
+        const taskToEdit = tasks.find((t) => t._id === id);
         setTaskName(taskToEdit.task);
         setTaskPriority(taskToEdit.priority);
         setTaskDeadline(taskToEdit.deadline);
-        const updatedTasks = tasks.filter((t) => t.id !== id);
+        const updatedTasks = tasks.filter((t) => t._id !== id);
         setTasks(updatedTasks);
     };
 
     const handleDeleteTask = (id) => {
-        const updatedTasks = tasks.filter((t) => t.id !== id);
+        const updatedTasks = tasks.filter((t) => t._id !== id);
         setTasks(updatedTasks);
     };
 
     const markDone = (id) => {
         const updatedTasks = tasks.map((t) =>
-            t.id === id ? { ...t, done: true } : t
+            t._id === id ? { ...t, done: true } : t
         );
         setTasks(updatedTasks);
 
-        const completedTask = tasks.find((t) => t.id === id);
+        const completedTask = tasks.find((t) => t._id === id);
         if (completedTask) {
             setCompletedTasks([...completedTasks, completedTask]);
         }
     };
 
-    const filteredTasks = tasks
-        .filter((t) => !t.done)
-        .filter((t) =>
-            t.task.toLowerCase().includes(searchKeyword.toLowerCase())
-        )
-        .filter((t) => (filterPriority ? t.priority === filterPriority : true));
-
     return (
         <div className={styles.App}>
             <Head>
-                <title>Task Manager - Geeksforgeeks.org</title>
+                <title>Task Manager</title>
             </Head>
             <header className={styles.taskHeader}>
                 <h1>Task Manager</h1>
@@ -136,10 +117,10 @@ const TaskScheduler = () => {
                 <TaskForm
                     taskName={taskName}
                     taskPriority={taskPriority}
-                    taskDeadline={taskVal}
-                    handleTaskNameChange={handleTaskNameChange}
-                    handleTaskPriorityChange={handleTaskPriorityChange}
-                    handleTaskDeadlineChange={handleTaskDeadlineChange}
+                    taskDeadline={taskDeadline}
+                    handleTaskNameChange={(e) => setTaskName(e.target.value)}
+                    handleTaskPriorityChange={(e) => setTaskPriority(e.target.value)}
+                    handleTaskDeadlineChange={(e) => setTaskDeadline(e.target.value)}
                     addTask={addTask}
                 />
                 {/* Search and Filter Component */}
@@ -164,7 +145,7 @@ const TaskScheduler = () => {
                 </div>
                 <h2 className={styles.heading}>Tasks</h2>
                 <TaskList
-                    tasks={filteredTasks}
+                    tasks={tasks}
                     markDone={markDone}
                     handleEditTask={handleEditTask}
                     handleDeleteTask={handleDeleteTask}
