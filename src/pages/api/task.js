@@ -1,48 +1,51 @@
-import clientPromise from "../../utils/mongodb";
+let tasks = [];
 
 export default async function handler(req, res) {
-  try {
-    const client = await clientPromise;
-    const db = client.db("task_manager"); // Use the "task_manager" database
+  if (req.method === "GET") {
+    const { searchKeyword = "", filterPriority = "" } = req.query;
+    const filtered = tasks.filter(t =>
+      t.task.toLowerCase().includes(searchKeyword.toLowerCase()) &&
+      (!filterPriority || t.priority === filterPriority)
+    );
+    res.status(200).json(filtered);
+  }
 
-    if (req.method === "GET") {
-      const { searchKeyword = "", filterPriority = "" } = req.query;
+  else if (req.method === "POST") {
+    const { task, priority, deadline } = req.body;
+    if (!task || !priority || !deadline)
+      return res.status(400).json({ message: "Missing required fields" });
+    const newTask = {
+      _id: Date.now().toString(),
+      task,
+      priority,
+      deadline,
+      done: false,
+    };
+    tasks.push(newTask);
+    res.status(201).json({ message: "Task created", task: newTask });
+  }
 
-      // Fetch tasks based on search and filter criteria
-      const query = {
-        task: { $regex: searchKeyword, $options: "i" }, // Case-insensitive search for task names
-      };
+  else if (req.method === "PUT") {
+    const { id, task, priority, deadline, done } = req.body;
+    const index = tasks.findIndex(t => t._id === id);
+    if (index === -1) return res.status(404).json({ message: "Task not found" });
+    if (task !== undefined) tasks[index].task = task;
+    if (priority !== undefined) tasks[index].priority = priority;
+    if (deadline !== undefined) tasks[index].deadline = deadline;
+    if (done !== undefined) tasks[index].done = done;
+    res.status(200).json({ message: "Task updated" });
+  }
 
-      if (filterPriority) {
-        query.priority = filterPriority; // Add priority filter if set
-      }
+  else if (req.method === "DELETE") {
+    const { id } = req.query;
+    const index = tasks.findIndex(t => t._id === id);
+    if (index === -1) return res.status(404).json({ message: "Task not found" });
+    tasks.splice(index, 1);
+    res.status(200).json({ message: "Task deleted" });
+  }
 
-      const tasks = await db.collection("tasks").find(query).toArray();
-      res.status(200).json(tasks); // Send back the tasks as JSON
-
-    } else if (req.method === "POST") {
-      const { task, priority, deadline } = req.body;
-
-      if (!task || !priority || !deadline) {
-        return res.status(400).json({ message: "Missing required fields" });
-      }
-
-      const newTask = {
-        task,
-        priority,
-        deadline,
-        done: false,
-      };
-
-      const result = await db.collection("tasks").insertOne(newTask);
-      res.status(201).json({ message: "Task created", taskId: result.insertedId });
-    } else {
-      // Handle unsupported methods
-      res.setHeader("Allow", ["GET", "POST"]);
-      res.status(405).end(`Method ${req.method} Not Allowed`);
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+  else {
+    res.setHeader("Allow", ["GET", "POST", "PUT", "DELETE"]);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
   }
 }
