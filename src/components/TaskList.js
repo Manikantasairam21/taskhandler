@@ -9,7 +9,7 @@ const TaskList = ({ tasks, markDone, handleEditTask, handleDeleteTask }) => {
   return (
     <div className={styles.taskList}>
       {tasks.length === 0 ? (
-        <p>No tasks available.</p>
+        <p className={styles.noTasksMessage}>No tasks available.</p>
       ) : (
         <table className={styles.taskTable}>
           <thead>

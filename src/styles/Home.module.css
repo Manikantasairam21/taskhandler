@@ -1,8 +1,8 @@
 /* styles/Home.module.css */
 
 .App {
-  background-color: #121212;
-  color: #ffffff;
+   background: linear-gradient(to bottom right, rgba(8, 100, 116, 0.95), rgb(7, 7, 7));
+  color: #212121;
   min-height: 100vh;
   padding: 3rem;
   font-family: 'Segoe UI', sans-serif;
@@ -10,17 +10,18 @@
   flex-direction: column;
   align-items: center;
   animation: fadeIn 1s ease-in;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-color: #1a1a1a;
 }
+
 
 .containerBox {
   width: 100%;
   max-width: 1150px;
-  border: 1px solid #444;
-  border-radius: 12px;
   padding: 2rem;
-  box-shadow: 0 0 10px rgba(255,255,255,0.1);
   margin-bottom: 2rem;
-  background-color: #1c1c1c;
   animation: fadeIn 1s ease-in-out;
 }
 
@@ -46,7 +47,7 @@
 
 .taskHeader h1 {
   font-size: 3rem;
-  color: #00bcd4;
+  color: #91eefb;
   letter-spacing: 1px;
 }
 
@@ -142,7 +143,7 @@
   border-collapse: collapse;
   margin-bottom: 2rem;
   max-width: 1100px;
-  box-shadow: 0 0 10px rgba(255,255,255,0.1);
+  box-shadow: 0 0 10px rgba(20, 19, 19, 0.855);
   animation: fadeIn 1.3s ease-in;
 }
 
@@ -155,6 +156,7 @@
   text-align: center;
   font-size: 1rem;
   transition: background 0.3s ease;
+  color: #ffffff;
 }
 
 .taskTable th,
@@ -234,13 +236,18 @@
 .completedHeading {
   font-size: 1.75rem;
   margin-bottom: 1rem;
-  color: #81c784;
+  color: #57eb57;
   text-align: center;
   animation: fadeIn 1s ease-in;
 }
 
 .completedTaskList {
   margin-top: 3rem;
+}
+.noTasksMessage {
+  color: white;
+  font-size: 1.1rem;
+  margin-top: 1rem;
 }
 
 @media (max-width: 768px) {
@@ -256,4 +263,5 @@
   .completedTable td {
     font-size: 0.9rem;
   }
+  
 }
